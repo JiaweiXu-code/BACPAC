@@ -2,10 +2,10 @@ Package: trialsimulation
 Title: Tools for Simulating Clinical Trials
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Jiawei",
-           family = "Xu",
+    person(given = "",
+           family = "",
            role = c("aut", "cre"),
-           email = "jiawei@live.unc.edu",
+           email = "",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE

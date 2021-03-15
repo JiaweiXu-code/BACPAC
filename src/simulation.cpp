@@ -1,0 +1,236 @@
+#include <sims.h>
+   
+// [[Rcpp::export]]
+   Rcpp::List SIM(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, 
+                 double true_sd, arma::vec true_mn, double hst_n, double hst_mn, double hst_sd, int nSims = 1000, int nSamp = 5000)
+   {
+   
+        // initialize random number generator;
+		Rcpp::RNGScope scope;  
+		
+		glm_mcmc b(nSamp);
+		
+		//double fb_sd  =  hst_sd/sqrt(hst_n);
+		double ec = 1-phi;
+		int block_size = block0.n_rows;
+		
+		double skp_sd = targetDelta/R::qnorm(ec,0,1,1,0);
+		double skp_vr = pow(skp_sd,2);
+		
+		double ent_mn = targetDelta; 
+		double ent_sd = targetDelta/R::qnorm(ec,0,1,1,0);
+        double ent_vr = pow(ent_sd,2);  
+		
+		// Construct container for mcmc samples;
+		arma::mat results(nSims,24, arma::fill::zeros);
+		
+		//int sim = 0;
+		for (int sim=0; sim<nSims; sim++)
+		{
+			// simulation results containers;
+		    int stop_enrollment	= 0;      // Indicator for early stoppage of enrollment (or trial if futility criteria met)
+		    int final_analysis  = 0;      // Indicator for final analysis; Note that final analysis may occur after ongoing patients are followed-up;  
+		    int n	            = 0;      // Number of patients currently enrolled 
+		    int nInt            = 0;      // Number of patients at interim where early stoppage takes place
+		    int analysis        = 0;      // Number of analyses performed 
+			int fut             = 0;      // indicator futility stopping criterion being met [interim only];
+		    arma::vec time_of_analysis(2, arma::fill::zeros);    //vector for time of analyses [interim, final]
+		    arma::vec eff(2, arma::fill::zeros);                  // indicator vector for efficacy criterion being met [interim, final] 
+
+			
+			// //////////// Generate data for the full hypothetical trial;
+
+		    // Generate enrollment times and outcome ascertainment times;
+			arma::vec r_all = Rcpp::rnorm(nMax, enr_mn, enr_sd);
+		    arma::vec r = cumsum(r_all);                              // cumulative enrollment times;
+		    arma::vec w = Rcpp::rnorm(nMax, asc_mn, asc_sd);          // ascertainment times;         
+		    arma::vec e = r + w;					                  // [study start] --> [outcome ascertainment] times
+
+		    // Simulate treatment group assignments;
+		    arma::vec z(nMax, arma::fill::zeros);
+		    int totalZ = 0;
+		    while(totalZ<nMax)
+		    {
+			    int start = totalZ + 1;
+				int stop;
+				if (totalZ + block_size>nMax) { stop = nMax; }
+				else                          { stop = totalZ + block_size; }
+			    totalZ   += block_size;
+			    z.rows(start-1,stop-1) = RcppArmadillo::sample(block0, block_size, FALSE).rows(0,(stop-start));
+		    }
+
+		    // Simulate outcomes;
+			arma::vec y(nMax);
+			for (int n=0; n<nMax; n++)
+			{
+			     y[n] = R::rnorm(true_mn[z[n]-1], true_sd);
+			}
+		    
+			
+			// ////////// Order patient data based on calendar time-to-outcome ascertainment;
+
+		    // create a data matrix and order by 
+		    arma::mat dat(nMax,5);
+            dat.col(0) = r;	
+            dat.col(1) = w;
+            dat.col(2) = e;
+            dat.col(3) = z;
+            dat.col(4) = y;	
+			
+ 		    arma::mat ordered_dat = dat.rows( sort_index(dat.col(2)) );
+			//arma::uvec index = sort_index(dat.col(2));
+			//arma::uvec t = {4,7,8,2,0,9,13};
+			//arma::mat test = dat.rows(t);
+
+		    //re-extract ordered data vectors;
+			arma::vec order_r = ordered_dat.col(0);
+		    arma::vec order_w = ordered_dat.col(1);
+		    arma::vec order_e = ordered_dat.col(2);
+		    arma::vec order_z = ordered_dat.col(3);
+		    arma::vec order_y = ordered_dat.col(4);
+		    arma::mat order_x(nMax,2, arma::fill::ones);
+            order_x.col(1) = order_z-1;
+			
+			
+			int loopNumber = 0;			
+			// ////// Sequentially analyze study data;
+			arma::vec enthusiastic_results, skeptical_results, yDat, zDat;
+			arma::mat xDat;
+			int nOngoing;
+			double a0 = 1, ess;
+			while ( (stop_enrollment*final_analysis)==0 )
+	        {		
+
+				int nREF, enrolled_set;
+		        if (stop_enrollment==0)  // indicator trial should continue;
+				{  			
+			        loopNumber += 1;     // increment number of outcomes ascertained;
+			        n += nByVec[loopNumber-1];
+
+			        if (n >= nMin)           // if minimum sample size is reached, increment sample size;
+				    {
+ 				        analysis += 1;
+				    }
+			        time_of_analysis[0] = order_e[n-1]; // identify time of most recent interim analysis
+
+			        // extract current observed data;
+			        yDat = order_y.rows(0,n-1);
+			        zDat = order_z.rows(0,n-1);
+			        xDat = order_x.rows(0,n-1);
+				    nREF = sum(zDat==1);
+
+			        //determine how many subjects are ongoing in the study; 
+			        nOngoing = sum(order_r<time_of_analysis[0])-n;
+		        } 
+			    else  // final analysis (to take place one interim stoppage criteria are met and ongoing patients are followed up;
+		        {  
+			        final_analysis = 1;
+			        // store number of outcomes ascertained at interim analysis;
+			        nInt = n;
+			
+			        if (fut==0) // perform final data aggregation only if futility criterion has NOT been met;
+			        { 
+				        // determine how many subjects are currently already enrolled 
+				        enrolled_set = sum(order_r<time_of_analysis[0]);
+
+				        // identify time of final analysis
+				        time_of_analysis[1] = order_e[enrolled_set-1];
+
+				        // extract final data;
+				        yDat = order_y.rows(0,enrolled_set-1);
+				        zDat = order_z.rows(0,enrolled_set-1);
+				        xDat = order_x.rows(0,enrolled_set-1);
+				        nREF = sum(order_z.rows(0,n-1) == 1);  
+				        n = yDat.n_rows;							
+			        } 
+				    else  // no further analysis if futility criterion HAS been met;
+			        {
+				        time_of_analysis[1]     = time_of_analysis[0];
+			        }
+		        }
+				
+				
+				
+		        // Perform data analysis once minimum number of outcomes are ascertained;
+		        if (n >= nMin)  			// compute deterministic power prior parameter and associated SD;
+		        {	
+                    if (nREF/hst_n<1) { a0 = nREF/hst_n; }					
+
+			        // compute prior variance and effective sample size;
+			        double hvr  = pow(hst_sd,2)/(hst_n*a0);
+			        ess = n + a0*hst_n;
+
+			        // skeptical prior analysis;
+				    // construct covariance matrix (skeptical prior)
+				    arma::mat cov0(2,2, arma::fill::zeros);
+					cov0(0,0) = hvr;
+					cov0(1,1) = skp_vr;
+				    arma::vec beta0 = {hst_mn,skp_mn}; 
+				    // perform gibbs sampler;
+				    skeptical_results = b.gibbs_sampler(yDat,xDat,cov0,beta0,0);
+				    double skp_pp = skeptical_results[4];
+
+			        // enthusiastic prior analysis;
+				    // construct covariance matrix (enthusiastic prior)
+					cov0(1,1) = ent_vr;
+					beta0[1] = ent_mn;
+				    // perform gibbs sampler;
+				    enthusiastic_results = b.gibbs_sampler(yDat,xDat,cov0,beta0,targetDelta);
+				    double ent_pp = enthusiastic_results[4];
+
+			        // maximum sample size reached (stop trial, considered final analysis);
+			        if (n >= nMax) 
+					{ 
+					    stop_enrollment = 1; 
+						final_analysis = 1;
+					}
+
+			        // evaluate futility criterion (stop trial, considered final analysis);
+			        if ((ent_pp<(1-ec)) and (final_analysis==0)) 
+					{ 
+					    stop_enrollment=1; 
+						fut=1;           
+						final_analysis=1; 
+					}
+
+			        // evaluate efficacy criterion (stop trial + consider follow-up on ongoing patients);
+			        if ((skp_pp>ec) and (final_analysis==0))     
+					{ 
+					    stop_enrollment=1;        
+						eff[0]=1;                  
+					}
+			        if ((skp_pp>ec) and (final_analysis==1))   
+					{                      
+					    eff[1]=1;              
+					}
+		        }	
+	        }	
+	
+			arma::vec betaHat = (xDat.t()*xDat).i() * xDat.t()*yDat;		
+			arma::vec muHat   = {betaHat[0],sum(betaHat)}; 
+			results.submat(sim,0,sim,4) = skeptical_results.t();
+			results.submat(sim,5,sim,9) = enthusiastic_results.t();
+			results(sim,10)               = analysis;
+			results(sim,11)               = nInt;
+			results(sim,12)               = nOngoing;
+			results(sim,13)               = n;
+			results(sim,14)               = ess;
+			results.submat(sim,15,sim,16) = betaHat.t(); //muHat.t();
+			results(sim,17)               = fut;
+			results.submat(sim,18,sim,19) = eff.t();
+			results(sim,20)               = true_sd;
+			results.submat(sim,21,sim,22) = true_mn.t();
+			results(sim,23)               = a0;
+		
+		}
+		
+
+				return Rcpp::List::create(  
+											//Rcpp::Named("xDat")   = xDat,
+											Rcpp::Named("results")   = results
+											//Rcpp::Named("yDat")   = yDat, 
+                                            //Rcpp::Named("zDat")   = zDat 											
+										  );
+										  
+ 
+   }

@@ -5,3 +5,4 @@
 SIM <- function(nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims = 1000L, nSamp = 5000L) {
     .Call(`_trialsimulation_SIM`, nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims, nSamp)
 }
+

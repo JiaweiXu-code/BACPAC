@@ -56,7 +56,7 @@ arma::vec gibbs_sampler(int & nSamp, const arma::vec & y, const arma::mat & x, c
    
 //' @export 
 // [[Rcpp::export]]
-Rcpp::List SIM(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, 
+Rcpp::List SIM_RAW(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, 
                double true_sd, arma::vec true_mn, double hst_n, double hst_mn, double hst_sd, int nSims = 1000, int nSamp = 5000)
 {
    

@@ -6,9 +6,9 @@
 
 using namespace Rcpp;
 
-// SIM
-Rcpp::List SIM(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, double true_sd, arma::vec true_mn, double hst_n, double hst_mn, double hst_sd, int nSims, int nSamp);
-RcppExport SEXP _trialsimulation_SIM(SEXP nMinSEXP, SEXP nMaxSEXP, SEXP nByVecSEXP, SEXP phiSEXP, SEXP targetDeltaSEXP, SEXP block0SEXP, SEXP enr_mnSEXP, SEXP enr_sdSEXP, SEXP asc_mnSEXP, SEXP asc_sdSEXP, SEXP skp_mnSEXP, SEXP true_sdSEXP, SEXP true_mnSEXP, SEXP hst_nSEXP, SEXP hst_mnSEXP, SEXP hst_sdSEXP, SEXP nSimsSEXP, SEXP nSampSEXP) {
+// SIM_RAW
+Rcpp::List SIM_RAW(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, double true_sd, arma::vec true_mn, double hst_n, double hst_mn, double hst_sd, int nSims, int nSamp);
+RcppExport SEXP _trialsimulation_SIM_RAW(SEXP nMinSEXP, SEXP nMaxSEXP, SEXP nByVecSEXP, SEXP phiSEXP, SEXP targetDeltaSEXP, SEXP block0SEXP, SEXP enr_mnSEXP, SEXP enr_sdSEXP, SEXP asc_mnSEXP, SEXP asc_sdSEXP, SEXP skp_mnSEXP, SEXP true_sdSEXP, SEXP true_mnSEXP, SEXP hst_nSEXP, SEXP hst_mnSEXP, SEXP hst_sdSEXP, SEXP nSimsSEXP, SEXP nSampSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -30,13 +30,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type hst_sd(hst_sdSEXP);
     Rcpp::traits::input_parameter< int >::type nSims(nSimsSEXP);
     Rcpp::traits::input_parameter< int >::type nSamp(nSampSEXP);
-    rcpp_result_gen = Rcpp::wrap(SIM(nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims, nSamp));
+    rcpp_result_gen = Rcpp::wrap(SIM_RAW(nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims, nSamp));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_trialsimulation_SIM", (DL_FUNC) &_trialsimulation_SIM, 18},
+    {"_trialsimulation_SIM_RAW", (DL_FUNC) &_trialsimulation_SIM_RAW, 18},
     {NULL, NULL, 0}
 };
 

@@ -39,7 +39,7 @@ a simple clinical trial with the following parameters.
 
 phi         -- Substantial Evidence Threshold 
 
-targetDelta -- Hypothesized treatment effect (T:P increase from week 6 to week 8) 
+targetDelta -- Hypothesized treatment effect 
 
 block0      -- Randomization information; note 1 = treatment, 2 = control
 
@@ -51,7 +51,7 @@ nMin   -- minimum to trigger the analysis
 
 nMax   -- upper limit of the sample size
 
-nByVec -- acrual rate
+nByVec -- accrual rate
  
  
 ### Parameters for enrollment distribution (interarrival times):
@@ -72,7 +72,7 @@ asc_sd -- standard deviation
 
 true_sd -- true standard deviation
 
-true_mn -- true mean change from week 6 to week 8 in T:T arm
+true_mn -- true mean change 
 
 
 ### Simulation Precision Inputs:
@@ -85,6 +85,62 @@ nSamp -- number of MCMC samples
 
 hst_n  -- sample size
 
-hst_mn -- azm cfb mean (also mean of normal power prior)
+hst_mn -- mean (also mean of normal power prior)
 
-hst_sd -- azm sd for cfb
+hst_sd -- standard deviation
+
+### Interpretation of outputs
+
+### Estiamtes under skeptical prior:
+
+skp_tau  -- inverse of standard deviation
+
+skp_mu1  -- effect of control arm 
+
+skp_mu0  -- effect of treated arm
+
+skp_diff -- treatment effect
+
+skp_pp   -- posterior probability of activity
+   
+### Estimates under enthusiastic prior:
+
+ent_tau  -- inverse of standard deviation
+
+ent_mu1  -- effect of control arm
+
+ent_mu0  -- effect of treated arm 
+
+ent_diff -- treatment effect
+
+ent_pp   -- posterior probability of activity
+
+### Estimates based on observed data:
+
+analysis -- number of analysis performed
+
+nInt     -- Number of patients at interim where early stoppage takes place
+
+nOngoing -- Number of patients at interim where early stoppage doesn't take place
+
+nFin     -- Number of patients currently enrolled   
+
+essFin   -- effective sample size
+
+y1Fin    -- estimated effect of control group 
+
+y2Fin    -- estimated treatment effect 
+
+fut      -- percentage of futility stopping [interim only] 
+
+effInt   -- percentage of efficacy stopping [interim] 
+
+effFin   -- percentage of efficacy stopping [final] 
+
+true_sd  -- true standard deviation in data generation model
+
+true_mu1 -- true mean change in control arm 
+
+true_mu0 -- true mean change in treated arm
+
+a0       -- deterministic power prior parameter  

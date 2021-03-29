@@ -55,6 +55,6 @@ SIM <- function(...){
     results <- as.data.frame(r$results);
     cres = c("tau","mu1","mu0","diff","pp");
     names(results) <- c(paste("skp",cres,sep="_"),paste("ent",cres,sep="_"),c("analysis","nInt","nOngoing","nFin","essFin","y1Fin","y2Fin","fut","effInt","effFin","true_sd","true_mu1","true_mu0","a0"));
-    results
+    colMeans(results)
 }
 

@@ -6,6 +6,22 @@
 
 using namespace Rcpp;
 
+// gibbs_sampler_raw
+arma::vec gibbs_sampler_raw(const int nSamp, const arma::vec& y, const arma::mat& x, const arma::mat cov0, const arma::vec beta0, const double theshold);
+RcppExport SEXP _trialsimulation_gibbs_sampler_raw(SEXP nSampSEXP, SEXP ySEXP, SEXP xSEXP, SEXP cov0SEXP, SEXP beta0SEXP, SEXP thesholdSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type nSamp(nSampSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type cov0(cov0SEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type beta0(beta0SEXP);
+    Rcpp::traits::input_parameter< const double >::type theshold(thesholdSEXP);
+    rcpp_result_gen = Rcpp::wrap(gibbs_sampler_raw(nSamp, y, x, cov0, beta0, theshold));
+    return rcpp_result_gen;
+END_RCPP
+}
 // SIM_RAW
 Rcpp::List SIM_RAW(int nMin, int nMax, arma::vec nByVec, double phi, double targetDelta, arma::vec block0, double enr_mn, double enr_sd, double asc_mn, double asc_sd, double skp_mn, double true_sd, arma::vec true_mn, double hst_n, double hst_mn, double hst_sd, int nSims, int nSamp);
 RcppExport SEXP _trialsimulation_SIM_RAW(SEXP nMinSEXP, SEXP nMaxSEXP, SEXP nByVecSEXP, SEXP phiSEXP, SEXP targetDeltaSEXP, SEXP block0SEXP, SEXP enr_mnSEXP, SEXP enr_sdSEXP, SEXP asc_mnSEXP, SEXP asc_sdSEXP, SEXP skp_mnSEXP, SEXP true_sdSEXP, SEXP true_mnSEXP, SEXP hst_nSEXP, SEXP hst_mnSEXP, SEXP hst_sdSEXP, SEXP nSimsSEXP, SEXP nSampSEXP) {
@@ -36,6 +52,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_trialsimulation_gibbs_sampler_raw", (DL_FUNC) &_trialsimulation_gibbs_sampler_raw, 6},
     {"_trialsimulation_SIM_RAW", (DL_FUNC) &_trialsimulation_SIM_RAW, 18},
     {NULL, NULL, 0}
 };

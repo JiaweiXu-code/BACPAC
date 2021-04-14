@@ -2,5 +2,6 @@
 
 export(SIM)
 export(SIM_RAW)
+export(gibbs_sampler_raw)
 importFrom(Rcpp,sourceCpp)
 useDynLib(trialsimulation, .registration = TRUE)

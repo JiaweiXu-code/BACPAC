@@ -1,16 +1,20 @@
 Package: trialsimulation
+Type: Package
 Title: Tools for Simulating Clinical Trials
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "Jaiwei",
-           family = "Xu",
-           role = c("aut", "cre"),
-           email = "jaiwei@live.unc.edu",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: MIT + file LICENSE
+Version: 0.1.1
+Date: 2021-4-1
+Authors@R: c(
+    person("Matt", "Psioda", email = "matt_psioda@unc.edu", role = "cre"),
+    person("Jiawei", "Xu", email = "jiawei@live.unc.edu", role = "aut"),
+    person("Vincent", "Toups", email = "toups@email.unc.edu", role = "aut"))    
+Maintainer: Matt Psioda <matt_psioda@unc.edu>                   
+Description: An implementation of the Bayesian anaylsis with historical data incorporated using a normal power prior. 
+    Contains a user-friendly wrapper for simulating trials with 2 normally distributed treatment arms  
+    and analyzing them using Gibbs sampling under skeptical and enthusiastic priors.
+License: GPL (>= 2)
 Encoding: UTF-8
-LazyData: true
+URL: https://github.com/JiaweiXu-code/BACPAC
+BugReports: https://github.com/JiaweiXu-code/BACPAC/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 LinkingTo: 

@@ -2,6 +2,11 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @export 
+gibbs_sampler_raw <- function(nSamp, y, x, cov0, beta0, theshold) {
+    .Call(`_trialsimulation_gibbs_sampler_raw`, nSamp, y, x, cov0, beta0, theshold)
+}
+
+#' @export 
 SIM_RAW <- function(nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims = 1000L, nSamp = 5000L) {
     .Call(`_trialsimulation_SIM_RAW`, nMin, nMax, nByVec, phi, targetDelta, block0, enr_mn, enr_sd, asc_mn, asc_sd, skp_mn, true_sd, true_mn, hst_n, hst_mn, hst_sd, nSims, nSamp)
 }

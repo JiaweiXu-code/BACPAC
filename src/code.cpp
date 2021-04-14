@@ -4,15 +4,9 @@
 using namespace Rcpp;
 using namespace arma;
 
-
-// //' @export
-// // [[Rcpp::export]]
-// arma::mat inner(arma::vec x, arma::vec y){
-//   arma::mat ip=x.t()*y;
-//   return(ip);
-// }
-
-arma::vec gibbs_sampler(int & nSamp, const arma::vec & y, const arma::mat & x, const arma::mat & cov0, const arma::vec & beta0, const double & theshold)
+//' @export 
+// [[Rcpp::export]]
+arma::vec gibbs_sampler_raw(const int nSamp, const arma::vec & y, const arma::mat & x, const arma::mat cov0, const arma::vec beta0, const double theshold)
 {
   // compute summary statistics;
   arma::mat xtx     = x.t()*x;
@@ -24,7 +18,7 @@ arma::vec gibbs_sampler(int & nSamp, const arma::vec & y, const arma::mat & x, c
   arma::vec beta = Rcpp::rnorm(2,50,10);
 		
   arma::mat samples(nSamp,5);
-  for (int i=-100;i<nSamp;i++)
+  for (int i=-1000;i<nSamp;i++)
     {
       // update tau | beta
       double a0  = 0.5*n;
@@ -220,7 +214,7 @@ Rcpp::List SIM_RAW(int nMin, int nMax, arma::vec nByVec, double phi, double targ
               cov0(1,1) = skp_vr;
               arma::vec beta0 = {hst_mn,skp_mn}; 
               // perform gibbs sampler;
-              skeptical_results = gibbs_sampler(nSamp,yDat,xDat,cov0,beta0,0);
+              skeptical_results = gibbs_sampler_raw(nSamp,yDat,xDat,cov0,beta0,0);
               double skp_pp = skeptical_results[4];
 
               // enthusiastic prior analysis;
@@ -228,7 +222,7 @@ Rcpp::List SIM_RAW(int nMin, int nMax, arma::vec nByVec, double phi, double targ
               cov0(1,1) = ent_vr;
               beta0[1] = ent_mn;
               // perform gibbs sampler;
-              enthusiastic_results = gibbs_sampler(nSamp,yDat,xDat,cov0,beta0,targetDelta);
+              enthusiastic_results = gibbs_sampler_raw(nSamp,yDat,xDat,cov0,beta0,targetDelta);
               double ent_pp = enthusiastic_results[4];
 
               // maximum sample size reached (stop trial, considered final analysis);

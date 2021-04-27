@@ -6,6 +6,10 @@ Rcpp/Armadillo wrapper for simulating a simple clinical trial.
 The long term goal is to develop a larger framework for simulating
 general clinical trials.
 
+# Building the Manual
+
+    make trialsimulation.pdf
+
 # Development
 
 See DESCRIPTION for a list of dependencies that you'll need to build
